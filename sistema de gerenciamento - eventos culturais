@@ -1,0 +1,126 @@
+-- data: 20/10/2025
+create database eventos_culturais;
+
+use eventos_culturais; -- seleciona o DB pra uso
+
+-- cria a tabela eventos de acordo com o modelo lógico
+CREATE TABLE eventos (
+  codigo INT AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(100) NOT NULL,
+  data_inicio DATE NOT NULL,
+  data_termino DATE,
+  tipo_evento VARCHAR(200) DEFAULT 'Não informado',
+  CHECK (data_termino > data_inicio) 
+);
+
+-- cria a tabela locais
+create table locais (
+	codigo int auto_increment primary key,
+    nome varchar(100) not null,
+    capacidade_total integer not null,
+    endereco_completo varchar(200) not null,
+    tipo_local varchar (100) default ("Não informado")
+);
+    
+-- cria tabela eventos_locais que é o relacionamento entre eventos e locais
+create table eventos_locais (
+	codigo integer auto_increment primary key,
+    codigo_evento integer,
+    codigo_local integer,
+    
+    foreign key (codigo_evento) references eventos(codigo),
+    foreign key (codigo_local) references locais(codigo)
+);
+
+-- data: 21/10/2025
+create table artista (
+	codigo integer auto_increment primary key,
+    codigo_evento integer,
+    nome_artistico varchar (100) not null,
+    nacionalidade varchar(100) not null,
+    estilo varchar (100) not null,
+    cache_artista float not null,
+    
+    foreign key (codigo_evento) references eventos(codigo)
+);
+
+create table equipe (
+	codigo integer auto_increment primary key,
+    funcao_principal varchar (150) not null,
+    quantidade_membros integer not null,
+    codigo_evento integer,
+    
+    foreign key (codigo_evento) references eventos(codigo) on delete cascade
+);
+
+create table equipe_apoio (
+	codigo integer auto_increment primary key,
+    codigo_local integer,
+    codigo_evento integer,
+    responsavel_equipe varchar (100) not null,
+    
+    foreign key (codigo_local) references eventos(codigo) on delete cascade,
+    foreign key (codigo_evento) references eventos(codigo) on delete cascade
+);
+
+create table equipe_profissional (
+	codigo integer auto_increment primary key,
+    codigo_eventos_locais integer,
+    codigo_profissional integer,
+    
+    foreign key (codigo_eventos_locais) references eventos_locais(codigo) on delete cascade,
+    foreign key (codigo_profissional) references profissional(codigo)
+);
+
+create table profissional (
+	codigo integer auto_increment primary key,
+    nome varchar (100) not null,
+    especialidade varchar (200) not null
+);
+
+create table patrocinio (
+	codigo integer auto_increment primary key,
+	nome varchar(150) not null,
+	valor_investido float not null,
+	tipo_parceria varchar(100) not null,
+    codigo_eventos integer,
+    
+    foreign key (codigo_eventos) references eventos(codigo)
+);
+
+create table ingresso (
+	codigo integer auto_increment primary key,
+    codigo_venda_ingresso integer,
+    tipo_ingresso varchar(100) not null,
+    valor_ingresso float not null,
+    quantidade_ingresso integer not null,
+    
+    foreign key (codigo_venda_ingresso) references venda_ingresso(codigo)
+);
+
+create table venda_ingresso (
+	codigo integer auto_increment primary key,
+    codigo_cliente integer,
+    codigo_evento integer,
+    data_venda date not null,
+    quantidade_vendida integer not null,
+    
+    foreign key (codigo_cliente) references cliente(codigo),
+    foreign key (codigo_evento) references eventos(codigo)
+);
+    
+create table cliente (
+	codigo integer auto_increment primary key,
+    nome_cliente varchar (200) not null,
+    cpf varchar (100) not null,
+    email varchar (100) not null
+);
+
+create table avaliacao (
+	codigo integer auto_increment primary key,
+    codigo_cliente integer,
+    nota_avaliacao integer not null,
+    comentario_avaliacao varchar (200) not null,
+    
+    foreign key (codigo_cliente) references cliente(codigo)
+);
